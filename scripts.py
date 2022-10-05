@@ -5,45 +5,81 @@ from matplotlib.pyplot import figure
 from sortedcontainers import SortedDict
 
 
-def mean(a, n):
-    sum = 0
-    for i in range(0, n):
-        sum = sum + a[i]
-    return float(sum / n)
+def counting(datafile, column):
+    els = list(count_elements(datafile[column]).items())
+    return els
 
 
-def median(a):
-    a.sort()
-    if len(a) % 2 != 0:
-        temp1 = int((len(a) + 1) / 2 - 1)
-        return a[temp1]
+def count_all(datafile, column):
+    els = counting(datafile, column)
+    amount = 0
+    for i in els:
+        amount += i[1]
+    return amount
+
+
+def mean(datafile, column):
+    els = counting(datafile, column)
+    value = 0
+    for i in els:
+        value += i[0] * i[1]
+    # print(amount)
+    # print(value)
+    return value / count_all(datafile, column)
+
+
+def median(datafile, column):
+    els = counting(datafile, column)
+    arr = []
+    amount = count_all(datafile, column)
+    for i in els:
+        for p in range(0, i[1]):
+            arr.append(i[0])
+    lasting = amount % 2
+    amount = math.floor(amount / 2)
+    if lasting == 0:
+        return arr[amount], amount
     else:
-        temp1 = int(len(a) / 2 - 1)
-        temp2 = int(len(a) / 2)
-        return (a[temp1] + a[temp2]) / 2
+        return arr[amount] + arr[amount + 1], amount
 
 
-def deriv(a):
-    sum = 0
-    for i in range(len(a)):
-        sum = sum + (a[i] - mean(a, len(a))) * (a[i] - mean(a, len(a)))
-    return float(math.sqrt(sum / len(a)))
+def quartile(datafile, column):
+    els = counting(datafile, column)
+    arr = []
+    for i in els:
+        for p in range(0, i[1]):
+            arr.append(i[0])
+    middle = median(datafile, column)[1]
+    parity = middle % 2
+    amount = math.floor(middle / 2)
+    if parity:
+        return arr[amount], arr[amount * 3], amount
+    else:
+        return arr[amount] + arr[amount + 1], arr[3 * amount] + arr[3 * amount + 1], amount
 
 
-def maximum(a):
-    temp = a[0]
-    for x in a:
-        if x > temp:
-            temp = x
-    return temp
+def deriv(datafile, column):
+    els = counting(datafile, column)
+    amount = 0
+    value = 0
+    for i in els:
+        value_temp = i[0]
+        amount += i[1]
+        for p in range(0, i[1]):
+            value = value + ((value_temp - mean(datafile, column)) * (value_temp - mean(datafile, column)))
+            # print(value)
+            # print(amount)
+    return float(math.sqrt(value / amount))
 
 
-def minimum(a):
-    temp = a[0]
-    for x in a:
-        if x < temp:
-            temp = x
-    return temp
+def maximum(datafile, column):
+    els = counting(datafile, column)
+    return els[-1][0]
+
+
+def minimum(datafile, column):
+    els = counting(datafile, column)
+    return els[0][0]
 
 
 def count_elements(seq) -> dict:
@@ -58,8 +94,8 @@ def draw_multiple_histogram(datafile, column, axis_label, types, output_name):
     datasets = []
     colors = ["red", "gold", "limegreen"]
     number = 0
+    els = counting(datafile, column)
     figure(figsize=(16, 8), dpi=80)
-    els = list(count_elements(datafile[column]).items())
     for i in types:
         dl = datafile[column].loc[datafile.Gatunek == i]
         data = count_elements(dl)
@@ -69,7 +105,7 @@ def draw_multiple_histogram(datafile, column, axis_label, types, output_name):
         plt.bar(size, amount, color=colors[number], width=0.1, edgecolor='black', alpha=0.5)
         number += 1
 
-    #print("Difference is: " + str(els[-1][0] - els[0][0]))
+    # print("Difference is: " + str(els[-1][0] - els[0][0]))
     if els[-1][0] - els[0][0] > 4:
         plt.xticks(np.arange(els[0][0], els[-1][0] + 0.2, 0.2))
     else:
