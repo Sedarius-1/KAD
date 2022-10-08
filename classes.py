@@ -14,6 +14,7 @@ def index_to_name(arg):
         arg = "virginica"
         return arg
 
+
 def name_to_index(arg):
     if arg == "setosa":
         arg = 0
@@ -24,13 +25,15 @@ def name_to_index(arg):
     elif arg == "virginica":
         arg = 2
         return arg
+
+
 class Flower:
-    def __init__(self, s_length, s_width, p_length, p_width, species):
-        self.s_length = s_length
-        self.s_width = s_width
-        self.p_length = p_length
-        self.p_width = p_width
-        self.species = species
+    def __init__(self, df):
+        self.s_length = df[0]
+        self.s_width = df[1]
+        self.p_length = df[2]
+        self.p_width = df[3]
+        self.species = df[4]
 
     def print_info(self):
         self.species = index_to_name(self.species)
@@ -49,14 +52,14 @@ class FlowerHolder:
     def get_list(self):
         return self.list
 
-    def count_occurences(self, arr,min, max, upper_bound, arg, step):
-        holder= {}
-        for i in np.arange(min,max,step):
-            index=round(i,1)
-            holder.update([(str(index),0)])
+    def count_occurences(self, arr, min, max, upper_bound, arg, step):
+        holder = {}
+        for i in np.arange(min, max+0.2, step):
+            index = round(i, 1)
+            holder.update([(str(index), 0)])
         for p in range(0, upper_bound):
-            if str(round(getattr(arr[p],arg),1)) in holder:
-                holder[str(round(getattr(arr[p],arg),1))] += 1
+            if str(round(getattr(arr[p], arg), 1)) in holder:
+                holder[str(round(getattr(arr[p], arg), 1))] += 1
         return holder
 
     @staticmethod
@@ -64,7 +67,7 @@ class FlowerHolder:
         temp = 0
         for i in range(0, upper_bound):
             if getattr(arr[i], arg) > temp:
-                temp= getattr(arr[i], arg)
+                temp = getattr(arr[i], arg)
         return temp
 
     def find_min(self, arr, arg, upper_bound):
@@ -75,13 +78,13 @@ class FlowerHolder:
         return temp
 
     @staticmethod
-    def median(arr, arg,upper_bound):
+    def median(arr, arg, upper_bound):
         median_index = math.ceil(upper_bound / 2)
         if median_index % 2 != 0:
-            median_value = getattr(arr[median_index-1], arg)
+            median_value = getattr(arr[median_index - 1], arg)
             return median_index, median_value
         else:
-            median_value = ((getattr(arr[median_index], arg)) + getattr(arr[median_index+1],arg)) / 2
+            median_value = ((getattr(arr[median_index], arg)) + getattr(arr[median_index + 1], arg)) / 2
             return median_index, median_value
 
     def quartile(self, arr, arg, upper_bound):
@@ -90,8 +93,8 @@ class FlowerHolder:
         upper_bound = mid_index
         quart = self.median(arr, arg, upper_bound)
         if quart[0] % 2 == 0:
-            quart_3_value = getattr(arr[(quart[0]*3)-2], arg)
-            return quart[0], quart[1], ((quart[0] * 3)-1), quart_3_value
+            quart_3_value = getattr(arr[(quart[0] * 3) - 2], arg)
+            return quart[0], quart[1], ((quart[0] * 3) - 1), quart_3_value
         else:
-            quart_3_value = (getattr(arr[(quart[0]*3)-2],arg) + getattr(arr[quart[0]*3-1],arg)) / 2
+            quart_3_value = (getattr(arr[(quart[0] * 3) - 2], arg) + getattr(arr[quart[0] * 3 - 1], arg)) / 2
             return quart[0], quart[1], quart[0] * 3, quart_3_value
