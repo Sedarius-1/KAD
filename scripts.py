@@ -1,3 +1,4 @@
+import pandas as pd
 from matplotlib import pyplot as plt
 
 
@@ -16,7 +17,7 @@ def draw_histogram(diction, axis_label, colour):
     plt.bar(size, amount, color=colour, width=1.0, edgecolor='black', alpha=0.4)
     plt.locator_params(axis='x')
     plt.ylabel('Quantity')
-    plt.xlabel(axis_label)
+    plt.xlabel(axis_label+" [cm]")
     xticks = plt.gca().xaxis.get_major_ticks()
     for i in range(len(xticks)):
         if i % 3 != 0:
@@ -42,4 +43,15 @@ def plot_multiple_hist(a, param, label):
                                      len(a[i].list), param, 0.1)
         draw_histogram(dict, label, colors[i])
     plt.savefig("output/" + param + "_multi.png")
+    plt.clf()
+
+
+def draw_box_plot(df,flower_args,i):
+    fig,ax=plt.subplots()
+    df.boxplot(ax=ax,column=str(i), by="5",color={'medians':'blue'})
+    ax.set_xticklabels(["setosa","versicolor","virginica"])
+    ax.set_ylabel(flower_args[i]+' [cm]')
+    plt.title('')
+    plt.suptitle('')
+    plt.savefig(f"output/{i}_boxplot.jpg", format="jpg")
     plt.clf()
