@@ -27,6 +27,7 @@ for i in flower_args:
     a.list = sorted(a.list, key=lambda x: getattr(x, i))
     print(f"Max value of {flower_args[i]} is {a.find_max(a.list, i, upper_bound)}")
     print(f"Min value of {flower_args[i]} is {a.find_min(a.list, i, upper_bound)}")
+    print(f"Avg value of {flower_args[i]} is {a.find_average(a.list, i, upper_bound)}")
     print(
         f"Median value of {flower_args[i]} is {a.median(a.list, i, upper_bound)[1]}, "
         f"index:{a.median(a.list, i, upper_bound)[0]}")
@@ -45,5 +46,5 @@ for i in flower_args:
     scr.draw_box_plot_obj(new_holders, i, flower_args[i])
     o_formatted.loc[len(o_formatted)] = data_row
 
-
 print(o_formatted.to_string(index=False))
+print("ASSIGNMENT 2\n")

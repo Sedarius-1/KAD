@@ -13,8 +13,7 @@ def plot_hist(a, param, upper_bound, label):
     :param label: the label of the histogram
     """
     a.list = sorted(a.list, key=lambda x: getattr(x, param))
-    diction = a.count_occurences(a.list, a.find_min(a.list, param, upper_bound),
-                                 a.find_max(a.list, param, upper_bound), upper_bound, param, 0.1)
+    diction = a.count_occurences(a.list, a.find_min(a.list, param, upper_bound), a.find_max(a.list, param, upper_bound),upper_bound, param, 0.1)
     draw_histogram(diction, label, 'red')
     plt.savefig("output/" + param + ".png")
     plt.clf()
@@ -31,7 +30,7 @@ def draw_histogram(diction, axis_label, colour):
     size = list(diction.keys())
     amount = list(diction.values())
     plt.bar(size, amount, color=colour, width=1.0, edgecolor='black', alpha=0.4)
-    plt.locator_params(axis='x')
+    #plt.locator_params(axis='x')
     plt.ylabel('Quantity')
     plt.xlabel(axis_label + " [cm]")
     xticks = plt.gca().xaxis.get_major_ticks()
@@ -111,4 +110,17 @@ def draw_box_plot_obj(a, param, arglist):
     ax.set_ylabel(arglist + ' [cm]')
     plt.suptitle('Species')
     plt.savefig(f"output/{param}_boxplot_obj.jpg", format="jpg")
+    plt.clf()
+
+def draw_scatter_plot(arr, arg1, arg2, upper_bound, arglist):
+    x = []
+    y = []
+    for i in range(0, upper_bound):
+        x.append(getattr(arr[i], arg1))
+        y.append(getattr(arr[i], arg2))
+    fig, ax = plt.subplots()
+    ax.set_ylabel(arglist[arg2])
+    ax.set_xlabel(arglist[arg1])
+    plt.scatter(x, y)
+    plt.show()
     plt.clf()

@@ -1,5 +1,6 @@
 import math
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -62,30 +63,6 @@ class Flower:
 
 # It's a class that holds a list of flowers, and has methods that
 # can be used to find the median, quartile, and count the occurences of a certain attribute of the flowers in the list.
-def count_occurences(arr, minimal, maximal, upper_bound, arg, step):
-    """
-    It takes an array of objects, a minimal value, a maximal value, an upper bound, an argument, and a step, and returns
-    a dictionary of the number of occurences of each value in the array of objects
-
-    :param arr: the array of objects
-    :param minimal: the minimal value of the attribute you want to count
-    :param maximal: the maximum value of the parameter you want to count
-    :param upper_bound: the number of elements in the array
-    :param arg: the attribute of the object you want to count
-    :param step: the step size of the histogram
-    :return: A dictionary with the keys being the values of the attribute and the values being the number of times that
-    value appears in the array.
-    """
-    holder = {}
-    for i in np.arange(minimal, maximal+0.2, step):
-        index = round(i, 1)
-        holder.update([(str(index), 0)])
-    for p in range(0, upper_bound):
-        if str(round(getattr(arr[p], arg), 1)) in holder:
-            holder[str(round(getattr(arr[p], arg), 1))] += 1
-    return holder
-
-
 class FlowerHolder:
     def __init__(self):
         self.list = []
@@ -104,6 +81,31 @@ class FlowerHolder:
         :return: The list is being returned.
         """
         return self.list
+
+    def count_occurences(self, arr, minimal, maximal, upper_bound, arg, step):
+        """
+        It takes an array of objects, a minimal value, a maximal value, an upper bound,
+        an argument, and a step, and returns a dictionary of the number of occurences
+        of each value in the array of objects
+
+        :param arr: the array of objects
+        :param minimal: the minimal value of the attribute you want to count
+        :param maximal: the maximum value of the parameter you want to count
+        :param upper_bound: the number of elements in the array
+        :param arg: the attribute of the object you want to count
+        :param step: the step size of the histogram
+        :return: A dictionary with the keys being the values of
+        the attribute and the values being the
+        number of times that value appears in the array.
+        """
+        holder = {}
+        for i in np.arange(minimal, maximal + 0.2, step):
+            index = round(i, 1)
+            holder.update([(str(index), 0)])
+        for p in range(0, upper_bound):
+            if str(round(getattr(arr[p], arg), 1)) in holder:
+                holder[str(round(getattr(arr[p], arg), 1))] += 1
+        return holder
 
     @staticmethod
     def find_max(arr, arg, upper_bound):
@@ -177,3 +179,23 @@ class FlowerHolder:
         else:
             quart_3_value = (getattr(arr[(quart[0] * 3) - 2], arg) + getattr(arr[quart[0] * 3 - 1], arg)) / 2
             return quart[0], quart[1], quart[0] * 3, quart_3_value
+
+    def find_average(self, arr, arg, upper_bound):
+        avg = 0
+        for i in range(0, upper_bound):
+            avg += getattr(arr[i], arg)
+        return avg / upper_bound
+
+    def find_pcc(self, arr, arg1, arg2, upper_bound):
+        sum_upper = 0
+        sum_lower_1 = 0
+        sum_lower_2 = 0
+        avg_x = self.find_average(arr, arg1, upper_bound)
+        avg_y = self.find_average(arr, arg2, upper_bound)
+        for i in range(0, upper_bound):
+            sum_upper += ((getattr(arr[i], arg1) - avg_x) * (getattr(arr[i], arg2) - avg_y))
+            sum_lower_1 += (getattr(arr[i], arg1) - avg_x) ** 2
+            sum_lower_2 += (getattr(arr[i], arg2) - avg_y) ** 2
+        pcc = sum_upper / (np.sqrt(sum_lower_1) * np.sqrt(sum_lower_2))
+        return pcc
+
