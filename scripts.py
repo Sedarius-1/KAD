@@ -1,4 +1,57 @@
 from matplotlib import pyplot as plt
+import pandas as pd
+import os
+
+
+def structure(flower_args):
+    if not os.path.exists("output"):
+        os.makedirs("output")
+    if not os.path.exists("output/assignment_1"):
+        os.makedirs("output/assignment_1")
+    for i in flower_args:
+        if not os.path.exists(f"output/assignment_1/{i}"):
+            os.makedirs(f"output/assignment_1/{i}")
+        continue
+    if not os.path.exists("output/assignment_2"):
+        os.makedirs(f"output/assignment_2")
+def assignment_1(a, flower_args, upper_bound, holders):
+    print("ASSIGNMENT 1\n")
+    output = {"Value": [], "Max": [], "Min": [], "Median": [], "Q1": [], "Q3": []}
+    o_formatted = pd.DataFrame(output)
+    for i in flower_args:
+        a.list = sorted(a.list, key=lambda x: getattr(x, i))
+        print(f"Max value of {flower_args[i]} is {a.find_max(a.list, i, upper_bound)}")
+        print(f"Min value of {flower_args[i]} is {a.find_min(a.list, i, upper_bound)}")
+        print(f"Avg value of {flower_args[i]} is {a.find_average(a.list, i, upper_bound)}")
+        print(
+            f"Median value of {flower_args[i]} is {a.median(a.list, i, upper_bound)[1]}, "
+            f"index:{a.median(a.list, i, upper_bound)[0]}")
+        print(
+            f"Quartile values of {flower_args[i]} are (Q1): {(a.quartile(a.list, i, upper_bound))[1]}, "
+            f"index: {(a.quartile(a.list, i, upper_bound))[0]} "
+            f"and (Q3): {(a.quartile(a.list, i, upper_bound))[3]}, "
+            f"index:{(a.quartile(a.list, i, upper_bound))[2]} ")
+        data_row = [flower_args[i], a.find_max(a.list, i, upper_bound), a.find_min(a.list, i, upper_bound),
+                    a.median(a.list, i, upper_bound)[1],
+                    (a.quartile(a.list, i, upper_bound))[1], (a.quartile(a.list, i, upper_bound))[3]]
+        plot_hist(a, i, upper_bound, flower_args[i])
+        new_holders = sort_holders_by_param(holders, i)
+        plot_multiple_hist(new_holders, i, flower_args[i])
+        # scr.draw_box_plot(df, flower_args, i)
+        draw_box_plot_obj(new_holders, i, flower_args[i])
+        o_formatted.loc[len(o_formatted)] = data_row
+    print(o_formatted.to_string(index=False))
+
+
+def assignment_2(flower_holder, flower_args, upper_bound):
+    print("\nASSIGNMENT 2\n")
+
+    scatter_plot(flower_holder, flower_args, 0, 1, upper_bound)
+    scatter_plot(flower_holder, flower_args, 0, 2, upper_bound)
+    scatter_plot(flower_holder, flower_args, 0, 3, upper_bound)
+    scatter_plot(flower_holder, flower_args, 1, 2, upper_bound)
+    scatter_plot(flower_holder, flower_args, 1, 3, upper_bound)
+    scatter_plot(flower_holder, flower_args, 2, 3, upper_bound)
 
 
 def plot_hist(a, param, upper_bound, label):
@@ -13,9 +66,35 @@ def plot_hist(a, param, upper_bound, label):
     :param label: the label of the histogram
     """
     a.list = sorted(a.list, key=lambda x: getattr(x, param))
-    diction = a.count_occurences(a.list, a.find_min(a.list, param, upper_bound), a.find_max(a.list, param, upper_bound),upper_bound, param, 0.1)
+    diction = a.count_occurences(a.list, a.find_min(a.list, param, upper_bound), a.find_max(a.list, param, upper_bound),
+                                 upper_bound, param, 0.1)
     draw_histogram(diction, label, 'red')
-    plt.savefig("output/" + param + ".png")
+    plt.savefig(f"output/assignment_1/{param}/{label}.png")
+    plt.clf()
+
+
+def scatter_plot(a, flower_args, x, y, upper_bound):
+    """
+    It takes in the list of flowers, the dictionary of flower arguments,
+    the x and y values of the flower arguments, and the upper bound of the data set.
+    It then finds the Pearson correlation coefficient of the x and y values, prints it,
+    and then draws the scatter plot and linear regression plot.
+
+    :param a: the object of the class Iris
+    :param flower_args: a dictionary of the flower attributes and their corresponding column names
+    :param x: the index of the first parameter
+    :param y: the y-axis variable
+    :param upper_bound: the upper bound of the data to be plotted
+    """
+    pcc = a.find_pcc(a.list, list(flower_args.keys())[x], list(flower_args.keys())[y], upper_bound)
+    print(f"Pearson corelation coefficient value of {list(flower_args.values())[x]} "
+          f"and {list(flower_args.values())[y]} is "
+          f"{pcc}")
+    linear = a.line_regression(a.list, list(flower_args.keys())[x], list(flower_args.keys())[y], upper_bound)
+    draw_scatter_plot(a.list, list(flower_args.keys())[x], list(flower_args.keys())[y], upper_bound, flower_args)
+    draw_linear_regression_plot(a.list, list(flower_args.keys())[x], linear[0], linear[1], upper_bound)
+    plt.title(f"r = {round(pcc, 2)}, y = {round(linear[0], 1)}x + {round(linear[1], 1)}")
+    plt.savefig(f"output/assignment_2/{str(list(flower_args.keys())[x])} to {str(list(flower_args.keys())[y])}.png")
     plt.clf()
 
 
@@ -30,7 +109,7 @@ def draw_histogram(diction, axis_label, colour):
     size = list(diction.keys())
     amount = list(diction.values())
     plt.bar(size, amount, color=colour, width=1.0, edgecolor='black', alpha=0.4)
-    #plt.locator_params(axis='x')
+    # plt.locator_params(axis='x')
     plt.ylabel('Quantity')
     plt.xlabel(axis_label + " [cm]")
     xticks = plt.gca().xaxis.get_major_ticks()
@@ -71,7 +150,7 @@ def plot_multiple_hist(a, param, label):
                                         a[i].find_max(a[i].list, param, len(a[i].list)),
                                         len(a[i].list), param, 0.1)
         draw_histogram(diction, label, colors[i])
-    plt.savefig("output/" + param + "_multi.png")
+    plt.savefig(f"output/assignment_1/{param}/{label}_multi.png")
     plt.clf()
 
 
@@ -109,10 +188,21 @@ def draw_box_plot_obj(a, param, arglist):
     ax.set_xticklabels(["setosa", "versicolor", "virginica"])
     ax.set_ylabel(arglist + ' [cm]')
     plt.suptitle('Species')
-    plt.savefig(f"output/{param}_boxplot_obj.jpg", format="jpg")
+    plt.savefig(f"output/assignment_1/{param}/{param}_boxplot_obj.jpg", format="jpg")
     plt.clf()
 
+
 def draw_scatter_plot(arr, arg1, arg2, upper_bound, arglist):
+    """
+    It takes in an array of objects, two arguments from the object, an upper bound, and a list of arguments,
+    and then plots the two arguments against each other
+
+    :param arr: the array of objects
+    :param arg1: the index of the first argument to be plotted
+    :param arg2: the attribute of the object to be plotted on the y-axis
+    :param upper_bound: the number of data points to be plotted
+    :param arglist: a list of the arguments in the class
+    """
     x = []
     y = []
     for i in range(0, upper_bound):
@@ -122,5 +212,22 @@ def draw_scatter_plot(arr, arg1, arg2, upper_bound, arglist):
     ax.set_ylabel(arglist[arg2])
     ax.set_xlabel(arglist[arg1])
     plt.scatter(x, y)
-    plt.show()
-    plt.clf()
+
+
+def draw_linear_regression_plot(arr, arg, a, b, upper_bound):
+    """
+    It takes an array of objects, an argument of those objects, and two numbers, and plots
+    a line of best fit for the given argument
+
+    :param arr: the array of objects
+    :param arg: the argument to be used for the linear regression
+    :param a: slope of the line
+    :param b: the y-intercept of the line
+    :param upper_bound: the number of data points to use for the regression
+    """
+    x = []
+    y = []
+    for i in range(0, upper_bound):
+        x.append(getattr(arr[i], arg))
+        y.append(a * getattr(arr[i], arg) + b)
+    plt.plot(x, y, color="red")

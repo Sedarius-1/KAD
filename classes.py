@@ -1,6 +1,4 @@
 import math
-
-import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -181,12 +179,31 @@ class FlowerHolder:
             return quart[0], quart[1], quart[0] * 3, quart_3_value
 
     def find_average(self, arr, arg, upper_bound):
+        """
+        It takes an array of objects, an attribute of those objects, and an upper bound, and returns the average of that
+        attribute for the first upper_bound objects in the array
+
+        :param arr: the array of objects
+        :param arg: the attribute of the object you want to find the average of
+        :param upper_bound: the number of elements in the array to be averaged
+        :return: The average of the attribute arg of the first upper_bound elements of the array arr.
+        """
         avg = 0
         for i in range(0, upper_bound):
             avg += getattr(arr[i], arg)
         return avg / upper_bound
 
     def find_pcc(self, arr, arg1, arg2, upper_bound):
+        """
+        The function takes in an array of objects, the name of two attributes of those objects, and an upper bound.
+        It then calculates the Pearson correlation coefficient between the two attributes
+
+        :param arr: the array of objects
+        :param arg1: The first argument to be compared
+        :param arg2: The name of the second attribute to be compared
+        :param upper_bound: the number of rows to be considered for the calculation of the PCC
+        :return: The Pearson Correlation Coefficient (PCC) is being returned.
+        """
         sum_upper = 0
         sum_lower_1 = 0
         sum_lower_2 = 0
@@ -199,3 +216,24 @@ class FlowerHolder:
         pcc = sum_upper / (np.sqrt(sum_lower_1) * np.sqrt(sum_lower_2))
         return pcc
 
+    def line_regression(self, arr, arg1, arg2, upper_bound):
+        """
+        It takes an array of objects, two arguments of those objects, and an upper bound, and returns the slope and
+        y-intercept of the line of best fit
+
+        :param arr: the array of objects
+        :param arg1: the name of the first argument (e.g. "x")
+        :param arg2: the name of the column that you want to predict
+        :param upper_bound: the number of elements in the array to be used for the regression
+        :return: The slope and the intercept of the regression line
+        """
+        sum_upper = 0
+        sum_lower = 0
+        avg_x = self.find_average(arr, arg1, upper_bound)
+        avg_y = self.find_average(arr, arg2, upper_bound)
+        for i in range(0, upper_bound):
+            sum_upper += ((getattr(arr[i], arg1) - avg_x) * (getattr(arr[i], arg2) - avg_y))
+            sum_lower += (getattr(arr[i], arg1) - avg_x) ** 2
+        a = sum_upper / sum_lower
+        b = avg_y - a * avg_x
+        return a, b
