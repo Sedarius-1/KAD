@@ -14,15 +14,17 @@ def structure(flower_args):
         continue
     if not os.path.exists("output/assignment_2"):
         os.makedirs(f"output/assignment_2")
+
 def assignment_1(a, flower_args, upper_bound, holders):
     print("ASSIGNMENT 1\n")
-    output = {"Value": [], "Max": [], "Min": [], "Median": [], "Q1": [], "Q3": []}
+    output = {"Value": [], "Min": [], "Avarage": [], "Standard Deviation": [], "Median": [], "Q1": [], "Q3" : [], "Max" : []}
     o_formatted = pd.DataFrame(output)
     for i in flower_args:
         a.list = sorted(a.list, key=lambda x: getattr(x, i))
         print(f"Max value of {flower_args[i]} is {a.find_max(a.list, i, upper_bound)}")
         print(f"Min value of {flower_args[i]} is {a.find_min(a.list, i, upper_bound)}")
-        print(f"Avg value of {flower_args[i]} is {a.find_average(a.list, i, upper_bound)}")
+        print(f"Avg value of {flower_args[i]} is {round(a.find_average(a.list, i, upper_bound), 2)}")
+        print(f"Standard Deviation value of {flower_args[i]} is {round(a.find_deviation(a.list, i , upper_bound),2)}")
         print(
             f"Median value of {flower_args[i]} is {a.median(a.list, i, upper_bound)[1]}, "
             f"index:{a.median(a.list, i, upper_bound)[0]}")
@@ -31,9 +33,11 @@ def assignment_1(a, flower_args, upper_bound, holders):
             f"index: {(a.quartile(a.list, i, upper_bound))[0]} "
             f"and (Q3): {(a.quartile(a.list, i, upper_bound))[3]}, "
             f"index:{(a.quartile(a.list, i, upper_bound))[2]} ")
-        data_row = [flower_args[i], a.find_max(a.list, i, upper_bound), a.find_min(a.list, i, upper_bound),
-                    a.median(a.list, i, upper_bound)[1],
-                    (a.quartile(a.list, i, upper_bound))[1], (a.quartile(a.list, i, upper_bound))[3]]
+        print("")
+        data_row = [flower_args[i], a.find_min(a.list, i, upper_bound), round(a.find_average(a.list, i, upper_bound),2),
+                    round(a.find_deviation(a.list, i, upper_bound),2), a.median(a.list, i, upper_bound)[1],
+                    (a.quartile(a.list, i, upper_bound))[1], (a.quartile(a.list, i, upper_bound))[3],
+                    a.find_max(a.list, i, upper_bound)]
         plot_hist(a, i, upper_bound, flower_args[i])
         new_holders = sort_holders_by_param(holders, i)
         plot_multiple_hist(new_holders, i, flower_args[i])
@@ -45,13 +49,9 @@ def assignment_1(a, flower_args, upper_bound, holders):
 
 def assignment_2(flower_holder, flower_args, upper_bound):
     print("\nASSIGNMENT 2\n")
-
-    scatter_plot(flower_holder, flower_args, 0, 1, upper_bound)
-    scatter_plot(flower_holder, flower_args, 0, 2, upper_bound)
-    scatter_plot(flower_holder, flower_args, 0, 3, upper_bound)
-    scatter_plot(flower_holder, flower_args, 1, 2, upper_bound)
-    scatter_plot(flower_holder, flower_args, 1, 3, upper_bound)
-    scatter_plot(flower_holder, flower_args, 2, 3, upper_bound)
+    for i in range(0,4):
+        for p in range(i+1,4):
+            scatter_plot(flower_holder, flower_args, i, p, upper_bound)
 
 
 def plot_hist(a, param, upper_bound, label):
@@ -145,7 +145,6 @@ def plot_multiple_hist(a, param, label):
     """
     colors = ['blue', 'orange', 'violet']
     for i in range(0, len(a)):
-        a[i].list = sorted(a[i].list, key=lambda x: getattr(x, param))
         diction = a[i].count_occurences(a[i].list, a[i].find_min(a[i].list, param, len(a[i].list)),
                                         a[i].find_max(a[i].list, param, len(a[i].list)),
                                         len(a[i].list), param, 0.1)
@@ -176,7 +175,6 @@ def draw_box_plot_obj(a, param, arglist):
     """
     main_container = []
     for i in range(0, len(a)):
-        a[i].list = sorted(a[i].list, key=lambda x: getattr(x, param))
         holder = []
         for n in range(0, len(a[i].list)):
             z = getattr(a[i].list[n], param)

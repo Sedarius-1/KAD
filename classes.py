@@ -193,6 +193,14 @@ class FlowerHolder:
             avg += getattr(arr[i], arg)
         return avg / upper_bound
 
+    def find_deviation(self, arr, arg, upper_bound):
+        sum = 0
+        avg = self.find_average(arr,arg,upper_bound)
+        for i in range(0,upper_bound):
+            sum = sum + (getattr(arr[i], arg) - avg) * (getattr(arr[i], arg) - avg)
+        return math.sqrt(sum / upper_bound)
+
+
     def find_pcc(self, arr, arg1, arg2, upper_bound):
         """
         The function takes in an array of objects, the name of two attributes of those objects, and an upper bound.
