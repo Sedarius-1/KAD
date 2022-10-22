@@ -20,4 +20,4 @@ flower_args = {'s_length': "Sepal length", 's_width': "Sepal width", 'p_length':
                'p_width': "Petal width"}
 scr.structure(flower_args)
 scr.assignment_1(flower_holder, flower_args, upper_bound, holders)
-scr.assignment_2(flower_holder, flower_args, upper_bound)
+# scr.assignment_2(flower_holder, flower_args, upper_bound)

@@ -1,6 +1,9 @@
-from matplotlib import pyplot as plt
-import pandas as pd
 import os
+
+import pandas as pd
+from matplotlib import pyplot as plt
+
+import classes
 
 
 def structure(flower_args):
@@ -15,16 +18,18 @@ def structure(flower_args):
     if not os.path.exists("output/assignment_2"):
         os.makedirs(f"output/assignment_2")
 
+
 def assignment_1(a, flower_args, upper_bound, holders):
     print("ASSIGNMENT 1\n")
-    output = {"Value": [], "Min": [], "Avarage": [], "Standard Deviation": [], "Median": [], "Q1": [], "Q3" : [], "Max" : []}
+    output = {"Value": [], "Min": [], "Avarage": [], "Standard Deviation": [], "Median": [], "Q1": [], "Q3": [],
+              "Max": []}
     o_formatted = pd.DataFrame(output)
     for i in flower_args:
         a.list = sorted(a.list, key=lambda x: getattr(x, i))
-        print(f"Max value of {flower_args[i]} is {a.find_max(a.list, i, upper_bound)}")
-        print(f"Min value of {flower_args[i]} is {a.find_min(a.list, i, upper_bound)}")
+        print(f"Max value of {flower_args[i]} is {a.find_max(a.list, i)}")
+        print(f"Min value of {flower_args[i]} is {a.find_min(a.list, i)}")
         print(f"Avg value of {flower_args[i]} is {round(a.find_average(a.list, i, upper_bound), 2)}")
-        print(f"Standard Deviation value of {flower_args[i]} is {round(a.find_deviation(a.list, i , upper_bound),2)}")
+        print(f"Standard Deviation value of {flower_args[i]} is {round(a.find_deviation(a.list, i, upper_bound), 2)}")
         print(
             f"Median value of {flower_args[i]} is {a.median(a.list, i, upper_bound)[1]}, "
             f"index:{a.median(a.list, i, upper_bound)[0]}")
@@ -34,14 +39,14 @@ def assignment_1(a, flower_args, upper_bound, holders):
             f"and (Q3): {(a.quartile(a.list, i, upper_bound))[3]}, "
             f"index:{(a.quartile(a.list, i, upper_bound))[2]} ")
         print("")
-        data_row = [flower_args[i], a.find_min(a.list, i, upper_bound), round(a.find_average(a.list, i, upper_bound),2),
-                    round(a.find_deviation(a.list, i, upper_bound),2), a.median(a.list, i, upper_bound)[1],
+        data_row = [flower_args[i], a.find_min(a.list, i),
+                    round(a.find_average(a.list, i, upper_bound), 2),
+                    round(a.find_deviation(a.list, i, upper_bound), 2), a.median(a.list, i, upper_bound)[1],
                     (a.quartile(a.list, i, upper_bound))[1], (a.quartile(a.list, i, upper_bound))[3],
-                    a.find_max(a.list, i, upper_bound)]
+                    a.find_max(a.list, i)]
         plot_hist(a, i, upper_bound, flower_args[i])
         new_holders = sort_holders_by_param(holders, i)
         plot_multiple_hist(new_holders, i, flower_args[i])
-        # scr.draw_box_plot(df, flower_args, i)
         draw_box_plot_obj(new_holders, i, flower_args[i])
         o_formatted.loc[len(o_formatted)] = data_row
     print(o_formatted.to_string(index=False))
@@ -49,8 +54,8 @@ def assignment_1(a, flower_args, upper_bound, holders):
 
 def assignment_2(flower_holder, flower_args, upper_bound):
     print("\nASSIGNMENT 2\n")
-    for i in range(0,4):
-        for p in range(i+1,4):
+    for i in range(0, 4):
+        for p in range(i + 1, 4):
             scatter_plot(flower_holder, flower_args, i, p, upper_bound)
 
 
@@ -66,7 +71,7 @@ def plot_hist(a, param, upper_bound, label):
     :param label: the label of the histogram
     """
     a.list = sorted(a.list, key=lambda x: getattr(x, param))
-    diction = a.count_occurences(a.list, a.find_min(a.list, param, upper_bound), a.find_max(a.list, param, upper_bound),
+    diction = a.count_occurences(a.list, a.find_min(a.list, param), a.find_max(a.list, param),
                                  upper_bound, param, 0.1)
     draw_histogram(diction, label, 'red')
     plt.savefig(f"output/assignment_1/{param}/{label}.png")
@@ -143,25 +148,15 @@ def plot_multiple_hist(a, param, label):
     :param param: the parameter we want to plot the histogram for
     :param label: the label of the x-axis
     """
-    colors = ['blue', 'orange', 'violet']
+    colors = ['blue', 'green', 'violet']
     for i in range(0, len(a)):
-        diction = a[i].count_occurences(a[i].list, a[i].find_min(a[i].list, param, len(a[i].list)),
-                                        a[i].find_max(a[i].list, param, len(a[i].list)),
+        color = int(getattr(a[i].list[0], 'species'))
+        diction = a[i].count_occurences(a[i].list, a[i].find_min(a[i].list, param),
+                                        a[i].find_max(a[i].list, param),
                                         len(a[i].list), param, 0.1)
-        draw_histogram(diction, label, colors[i])
+        draw_histogram(diction, label, colors[color])
     plt.savefig(f"output/assignment_1/{param}/{label}_multi.png")
     plt.clf()
-
-
-# def draw_box_plot(df, flower_args, i):
-#     fig, ax = plt.subplots()
-#     df.boxplot(ax=ax, column=str(i), by="5", color={'medians': 'blue'})
-#     ax.set_xticklabels(["setosa", "versicolor", "virginica"])
-#     ax.set_ylabel(flower_args[i] + ' [cm]')
-#     plt.title('')
-#     plt.suptitle('')
-#     plt.savefig(f"output/{i}_boxplot.jpg", format="jpg")
-#     plt.clf()
 
 
 def draw_box_plot_obj(a, param, arglist):
@@ -174,16 +169,18 @@ def draw_box_plot_obj(a, param, arglist):
     :param arglist: the name of the parameter being plotted
     """
     main_container = []
+    name_container = []
     for i in range(0, len(a)):
         holder = []
         for n in range(0, len(a[i].list)):
             z = getattr(a[i].list[n], param)
             holder.append(z)
         main_container.append(holder)
+        name_container.append(classes.index_to_name(getattr(a[i].list[0], 'species')))
     fig, ax = plt.subplots()
     plt.boxplot(main_container)
     plt.title('')
-    ax.set_xticklabels(["setosa", "versicolor", "virginica"])
+    ax.set_xticklabels(name_container)
     ax.set_ylabel(arglist + ' [cm]')
     plt.suptitle('Species')
     plt.savefig(f"output/assignment_1/{param}/{param}_boxplot_obj.jpg", format="jpg")

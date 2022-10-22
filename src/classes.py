@@ -31,7 +31,7 @@ def name_to_index(arg):
         arg = 0
         return arg
     elif arg == "versicolor":
-        arg = 0
+        arg = 1
         return arg
     elif arg == "virginica":
         arg = 2
@@ -80,7 +80,8 @@ class FlowerHolder:
         """
         return self.list
 
-    def count_occurences(self, arr, minimal, maximal, upper_bound, arg, step):
+    @staticmethod
+    def count_occurences(arr, minimal, maximal, upper_bound, arg, step):
         """
         It takes an array of objects, a minimal value, a maximal value, an upper bound,
         an argument, and a step, and returns a dictionary of the number of occurences
@@ -106,36 +107,28 @@ class FlowerHolder:
         return holder
 
     @staticmethod
-    def find_max(arr, arg, upper_bound):
+    def find_max(arr, arg):
         """
-                It takes an array of objects, an attribute of those objects, and an upper bound, and returns the maximum
-                value of that attribute in the array
-
-                :param arr: the array of objects
-                :param arg: the attribute of the object you want to find the max of
-                :param upper_bound: the number of elements in the array
-                :return: The maximum value of the attribute arg in the array arr.
-                """
-        temp = 0
-        for i in range(0, upper_bound):
-            if getattr(arr[i], arg) > temp:
-                temp = getattr(arr[i], arg)
-        return temp
-
-    def find_min(self, arr, arg, upper_bound):
-        """
-        It finds the minimum value of a given attribute in a given array.
+        It takes an array of objects and an attribute name, and returns the value of the attribute of the last
+        object in the sorted array
 
         :param arr: the array of objects
-        :param arg: the attribute of the object you want to find the max/min of
-        :param upper_bound: the number of elements in the array
-        :return: The minimum value of the attribute arg in the array arr.
+        :param arg: The name of the attribute to find the max of
+        :return: The last element of the array.
         """
-        temp = self.find_max(arr, arg, upper_bound)
-        for i in range(0, upper_bound):
-            if getattr(arr[i], arg) < temp:
-                temp = getattr(arr[i], arg)
-        return temp
+        return getattr(arr[-1], arg)
+
+    @staticmethod
+    def find_min(arr, arg):
+        """
+        It takes an array of objects and an attribute name, and returns the
+        minimum value of that attribute in the sorted array
+
+        :param arr: the array of objects
+        :param arg: The name of the attribute you want to find the minimum of
+        :return: The first element of the array.
+        """
+        return getattr(arr[0], arg)
 
     @staticmethod
     def median(arr, arg, upper_bound):
@@ -149,7 +142,7 @@ class FlowerHolder:
         :return: The median index and the median value.
         """
         median_index = math.ceil(upper_bound / 2)
-        if median_index % 2 != 0:
+        if upper_bound % 2 != 0:
             median_value = getattr(arr[median_index - 1], arg)
             return median_index, median_value
         else:
@@ -178,7 +171,8 @@ class FlowerHolder:
             quart_3_value = (getattr(arr[(quart[0] * 3) - 2], arg) + getattr(arr[quart[0] * 3 - 1], arg)) / 2
             return quart[0], quart[1], quart[0] * 3, quart_3_value
 
-    def find_average(self, arr, arg, upper_bound):
+    @staticmethod
+    def find_average(arr, arg, upper_bound):
         """
         It takes an array of objects, an attribute of those objects, and an upper bound, and returns the average of that
         attribute for the first upper_bound objects in the array
@@ -194,12 +188,20 @@ class FlowerHolder:
         return avg / upper_bound
 
     def find_deviation(self, arr, arg, upper_bound):
-        sum = 0
-        avg = self.find_average(arr,arg,upper_bound)
-        for i in range(0,upper_bound):
-            sum = sum + (getattr(arr[i], arg) - avg) * (getattr(arr[i], arg) - avg)
-        return math.sqrt(sum / upper_bound)
+        """
+        It takes an array of objects, an attribute of those objects, and an upper bound,
+        and returns the standard deviation of that attribute
 
+        :param arr: the array of objects
+        :param arg: the name of the attribute you want to find the average of
+        :param upper_bound: the number of elements in the array to be considered
+        :return: The standard deviation of the given attribute of the given array.
+        """
+        sum_dev = 0
+        avg = self.find_average(arr, arg, upper_bound)
+        for i in range(0, upper_bound):
+            sum_dev = sum_dev + (getattr(arr[i], arg) - avg) * (getattr(arr[i], arg) - avg)
+        return math.sqrt(sum_dev / upper_bound)
 
     def find_pcc(self, arr, arg1, arg2, upper_bound):
         """
