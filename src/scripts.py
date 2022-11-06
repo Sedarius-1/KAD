@@ -94,7 +94,7 @@ def scatter_plot(a, flower_args, x, y, upper_bound):
     pcc = a.find_pcc(a.list, list(flower_args.keys())[x], list(flower_args.keys())[y], upper_bound)
     print(f"Pearson corelation coefficient value of {list(flower_args.values())[x]} "
           f"and {list(flower_args.values())[y]} is "
-          f"{pcc}")
+          f"{round(pcc,2)}")
     linear = a.line_regression(a.list, list(flower_args.keys())[x], list(flower_args.keys())[y], upper_bound)
     draw_scatter_plot(a.list, list(flower_args.keys())[x], list(flower_args.keys())[y], upper_bound, flower_args)
     draw_linear_regression_plot(a.list, list(flower_args.keys())[x], linear[0], linear[1], upper_bound)

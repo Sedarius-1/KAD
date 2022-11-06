@@ -146,7 +146,7 @@ class FlowerHolder:
             median_value = getattr(arr[median_index - 1], arg)
             return median_index, median_value
         else:
-            median_value = ((getattr(arr[median_index], arg)) + getattr(arr[median_index + 1], arg)) / 2
+            median_value = ((getattr(arr[median_index - 1], arg)) + getattr(arr[median_index], arg)) / 2
             return median_index, median_value
 
     def quartile(self, arr, arg, upper_bound):
